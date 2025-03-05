@@ -1,4 +1,5 @@
-﻿using Ecom.Core.DTO;
+﻿using AutoMapper;
+using Ecom.Core.DTO;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.interfaces;
 using Microsoft.AspNetCore.Http;
@@ -8,9 +9,13 @@ namespace Ecom.API.Controllers
 {
     public class CategoriesController : BaseController
     {
-        public CategoriesController(IUnitofWork work) : base(work)
+        public CategoriesController(IUnitofWork work, IMapper mapper) : base(work, mapper)
         {
         }
+
+        //public CategoriesController(IUnitofWork work) : base(work)
+        //{
+        //}
         [HttpGet("get-all")]
         public async Task<IActionResult> get()
         {
@@ -49,11 +54,7 @@ namespace Ecom.API.Controllers
         {
             try
             {
-                var category = new Category()
-                {
-                    Name = categoryDTO.Name,
-                    Description = categoryDTO.Description
-                };
+                var category= mapper.Map<Category>(categoryDTO);
                  await work.CategoryRepositry.AddAsync(category);
                 return Ok(new {message="Item has been Added"});
             }
@@ -68,12 +69,7 @@ namespace Ecom.API.Controllers
         {
             try
             {
-                var category = new Category()
-                {
-                    Id = categoryDTO.id,
-                    Name = categoryDTO.Name,
-                    Description = categoryDTO.Description
-                };
+                var category = mapper.Map<Category>(categoryDTO);
                 await work.CategoryRepositry.UpdateAsync(category);
                 return Ok(new { message = "Item has been Updated" });
             }
