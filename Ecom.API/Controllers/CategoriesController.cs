@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecom.API.Helper;
 using Ecom.Core.DTO;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.interfaces;
@@ -13,9 +14,6 @@ namespace Ecom.API.Controllers
         {
         }
 
-        //public CategoriesController(IUnitofWork work) : base(work)
-        //{
-        //}
         [HttpGet("get-all")]
         public async Task<IActionResult> get()
         {
@@ -24,7 +22,7 @@ namespace Ecom.API.Controllers
                 //list of categories
                 var category = await work.CategoryRepositry.GetAllAsync();
                 if (category is null)
-                    return BadRequest();
+                    return BadRequest(new ResponseAPI(400));
                 return Ok(category);
 
             }
@@ -40,7 +38,7 @@ namespace Ecom.API.Controllers
             {
                 var category = await work.CategoryRepositry.GetByIdAsync(id);
                 if(category is null)
-                    return BadRequest();
+                    return BadRequest(new ResponseAPI(400,$"not found category id={id}"));
                 return Ok(category);
             }
             catch (Exception ex)
@@ -56,7 +54,7 @@ namespace Ecom.API.Controllers
             {
                 var category= mapper.Map<Category>(categoryDTO);
                  await work.CategoryRepositry.AddAsync(category);
-                return Ok(new {message="Item has been Added"});
+                return Ok(new ResponseAPI(200, "item has been added"));
             }
             catch (Exception ex)
             {
@@ -71,7 +69,7 @@ namespace Ecom.API.Controllers
             {
                 var category = mapper.Map<Category>(categoryDTO);
                 await work.CategoryRepositry.UpdateAsync(category);
-                return Ok(new { message = "Item has been Updated" });
+                return Ok(new ResponseAPI(200, "item has been updated"));
             }
             catch (Exception ex)
             {
@@ -84,7 +82,7 @@ namespace Ecom.API.Controllers
             try
             {
                 await work.CategoryRepositry.DeleteAsync(id);
-                return Ok(new { message = "Item has been Deleted" });
+                return Ok(new ResponseAPI(200,"item has been deleted"));
             }
             catch (Exception ex)
             {
