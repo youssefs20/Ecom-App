@@ -46,7 +46,36 @@ namespace Ecom.API.Controllers
             catch (Exception ex)
             {
 
-                throw;
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("Add-Product")]
+        public async Task<IActionResult> add(AddProductDTO productDTO)
+        {
+            try
+            {
+                await work.ProductRepositry.AddAsync(productDTO);
+                return Ok(new ResponseAPI(200));
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseAPI(400, ex.Message));
+            }
+        }
+        [HttpPut("Update-Product")]
+        public async Task<IActionResult> Update(UpdateProductDTO updateProductDTO) 
+        {
+            try
+            {
+                await work.ProductRepositry.UpdateAsync(updateProductDTO);
+                return Ok(new ResponseAPI(200));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(400, ex.Message));
             }
         }
     }

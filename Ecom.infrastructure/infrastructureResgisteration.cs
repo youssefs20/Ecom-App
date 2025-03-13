@@ -1,9 +1,12 @@
 ﻿using Ecom.Core.interfaces;
+using Ecom.Core.Services;
 using Ecom.infrastructure.Data;
 using Ecom.infrastructure.Repositries;
+using Ecom.infrastructure.Repositries.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +25,11 @@ namespace Ecom.infrastructure
             services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositry<>));
             //apply unit of work
             services.AddScoped<IUnitofWork, UnitofWork>();
+
+            services.AddSingleton<IImageManagementService, ImageManagementService>();
+            services.AddSingleton<IFileProvider>(
+                new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"wwwroot")));
+
             //apply Dbcontext
             services.AddDbContext<AppDbContext>(op =>
             {
