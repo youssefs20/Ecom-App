@@ -32,7 +32,7 @@ namespace Ecom.API.Controllers
             }
             catch (Exception ex)
             {
-
+                
                 return BadRequest(ex.Message);
             }
         }

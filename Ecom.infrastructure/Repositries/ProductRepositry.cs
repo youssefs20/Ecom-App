@@ -32,6 +32,22 @@ namespace Ecom.infrastructure.Repositries
                 .Include(m=>m.Category)
                 .Include(m=>m.Photos)
                 .AsNoTracking();
+            //filter by word
+            if (!string.IsNullOrEmpty(productParams.Search))
+            {
+                //query = query
+                //    .Where(m => m.Name.ToLower().Contains(productParams.Search.ToLower())
+                //    || m.Description.ToLower().Contains(productParams.Search.ToLower()));
+
+                //expand teh search 
+                //
+                var searchWords = productParams.Search.Split(' ');
+                query = query.Where(m => searchWords.All(word =>
+                m.Name.ToLower().Contains(word.ToLower()) ||
+                m.Description.ToLower().Contains(word.ToLower())
+                ));
+            }
+
             //filter by categoryId
             if(productParams.CategoryId.HasValue)
                 query = query.Where(m=>m.CategoryId == productParams.CategoryId);
