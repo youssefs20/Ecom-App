@@ -3,6 +3,7 @@ using Ecom.Core.DTO;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.interfaces;
 using Ecom.Core.Services;
+using Ecom.Core.Sharing;
 using Ecom.infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,7 +25,38 @@ namespace Ecom.infrastructure.Repositries
             this.mapper = mapper;
             this.imageManagementService = imageManagementService;
         }
+        //string? sort, int? CategoryId,int pageSize,int PageNumber
+        public async Task<IEnumerable<ProductDTO>> GetAllAsync(ProductParams productParams) 
+        {
+            var query = context.Products
+                .Include(m=>m.Category)
+                .Include(m=>m.Photos)
+                .AsNoTracking();
+            //filter by categoryId
+            if(productParams.CategoryId.HasValue)
+                query = query.Where(m=>m.CategoryId == productParams.CategoryId);
 
+            if (!string.IsNullOrEmpty(productParams.Sort))
+            {
+                query = productParams.Sort switch
+                {
+                    "PriceAsn" => query.OrderBy(m => m.NewPrice),
+                    "PriceDes" => query.OrderByDescending(m => m.NewPrice),
+                    _ => query.OrderBy(m => m.Name),
+                };
+            }
+            //PageNumber = PageNumber>0 ? PageNumber : 1;
+            //pageSize = pageSize > 0 ? pageSize : 3;
+            //pagination 
+            //if user send pageSize 3 and PageNumber 1 
+            // skip 0 and take 3
+            //other ex: if user send pageSize 3 and PageNumber 2
+            // skip 3 and take 3
+            query = query.Skip((productParams.pageSize) * (productParams.PageNumber - 1))
+                .Take(productParams.pageSize);
+            var result = mapper.Map<List<ProductDTO>>(query);
+            return result;
+        }
         public async Task<bool> AddAsync(AddProductDTO productDTO)
         {
             if (productDTO == null) return false;

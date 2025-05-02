@@ -4,26 +4,31 @@ using Ecom.Core.DTO;
 using Ecom.Core.interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Ecom.Core.Services;
+using Ecom.Core.Sharing;
 
 namespace Ecom.API.Controllers
-{
+{ //34
 
     public class ProductsController : BaseController
     {
-        public ProductsController(IUnitofWork work, IMapper mapper) : base(work, mapper)
+        private readonly IImageManagementService service;
+
+        public ProductsController(IUnitofWork work, IMapper mapper, IImageManagementService service) : base(work, mapper)
         {
+            this.service = service;
         }
         [HttpGet("get-all")]
-        public async Task<IActionResult> get()
+        //string? sort, int? CategoryId,int pageSize,int PageNumber
+        //
+        public async Task<IActionResult> get([FromQuery] ProductParams productParams)
         {
             try
             {
                 var Product = await work.ProductRepositry
-                    .GetAllAsync(x=>x.Category, x => x.Photos);
-                var result = mapper.Map<List<ProductDTO>>(Product);
-                if (Product is null)
-                    return BadRequest(new ResponseAPI(400));
-                return Ok(result);
+                    .GetAllAsync(productParams);
+                var totalCount = await work.ProductRepositry.CountAsync();
+                return Ok(new Pagination<ProductDTO>(productParams.PageNumber, productParams.pageSize, totalCount, Product));
             }
             catch (Exception ex)
             {
@@ -60,7 +65,7 @@ namespace Ecom.API.Controllers
             }
             catch (Exception ex)
             {
-
+                
                 return BadRequest(new ResponseAPI(400, ex.Message));
             }
         }
