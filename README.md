@@ -1,7 +1,7 @@
 # ECom-API (.NET Clean Architecture)
 
 A structured **E-Commerce RESTful API** built with **ASP.NET Core** following the **Clean Architecture** pattern.  
-The project provides backend services for products, users, authentication, orders, and more — ready to be connected with a frontend.
+The project provides backend services for products, orders, and more — ready to be connected with a frontend.
 
 ---
 
